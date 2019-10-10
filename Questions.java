@@ -12,7 +12,8 @@ class Questions
 	{
 		Parser.read(arg);
 		// q1();
-		q2();
+		// q2();
+		q3();
 	}
 
 	public static void q1()
@@ -52,5 +53,32 @@ class Questions
 		}
 
 		System.out.println("No. of unique TCP flows = "+set.size()+"\n");
+	}
+
+	public static void q3()
+	{
+		HashSet<String> set = new HashSet<>();
+		int[] count = new int[24];
+
+		for(int i=0;i<Parser.data.size();++i)
+		{
+			if(Parser.data.get(i).get(4).equals("TCP"))
+			{
+				int hr = (int)(Double.parseDouble(Parser.data.get(i).get(1))/3600);
+				String s = Parser.data.get(i).get(6);
+				String res = Parser.data.get(i).get(2)+" "+Parser.data.get(i).get(3)+" ";
+				String p1 = s.substring(0,s.indexOf('>'));
+				String p2 = s.substring(s.indexOf('>')+1, s.indexOf('['));
+				p1.trim();p2.trim();
+
+				res+= (p1+" "+p2);
+				if(set.add(res))
+					count[hr]++;
+			}
+		}
+
+		for(int i=0;i<24;++i)
+			System.out.println("hr "+i+" to "+(i+1)+" = "+count[i]);
+		System.out.println();
 	}
 }
