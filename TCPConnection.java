@@ -3,14 +3,16 @@ class TCPConnection
 	private double startTime;
 	private String serverIP, clientIP;
 	private int serverPort, clientPort;
+	public int size;
 
-	TCPConnection(double t, String a, String b, int x, int y)
+	TCPConnection(double t, String a, String b, int x, int y, int s)
 	{
 		startTime = t;
 		serverIP = a;
 		clientIP = b;
 		serverPort = x;
 		clientPort = y;
+		size = s;
 	}
 
 	public boolean isIP(String x, String y)
