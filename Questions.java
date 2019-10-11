@@ -29,8 +29,8 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q4"));
 			// q4();
 
-			// out = new PrintWriter(new File(arg+"_q5"));
-			// q5();
+			out = new PrintWriter(new File(arg+"_q5"));
+			q5();
 		}catch(Exception e){e.printStackTrace();}
 	}
 
@@ -121,7 +121,7 @@ class Questions
 				int sp = Integer.parseInt(p2);
 					
 				if(Parser.data.get(i).get(6).contains("[SYN]"))
-					connections.add(new TCPConnection(t, server, client, sp, cp));
+					connections.add(new TCPConnection(t, server, client, sp, cp, 0));
 				
 				else if(Parser.data.get(i).get(6).contains("[FIN, ACK]") || Parser.data.get(i).get(6).contains("[RST]"))
 				{
@@ -143,7 +143,7 @@ class Questions
 			// out.println(time.get(i));
 		// out.println("\"0\",\"0\"");
 		double size = time.size();
-		 int i = 0;
+		int i = 0;
 		for(double j = 1; j<=3700;j+=0.5)
 		{
 			for(int k=i;;++k)
@@ -157,6 +157,103 @@ class Questions
 
 			out.println(j+" "+((i+1)/size));
 		}
+		out.close();
+	}
+
+	public static void q5()
+	{
+		ArrayList<TCPConnection> connections = new ArrayList<>();
+		ArrayList<Integer> packetsSize = new ArrayList<>();
+		ArrayList<Double> time = new ArrayList<>();
+
+		for(int i=0;i<Parser.data.size();++i)
+		{
+			if(Parser.data.get(i).get(4).equals("TCP"))
+			{
+				double t = Double.parseDouble(Parser.data.get(i).get(1));
+				String client = Parser.data.get(i).get(2);
+				String server = Parser.data.get(i).get(3);
+				String s = Parser.data.get(i).get(6);
+				String p1 = s.substring(0,s.indexOf('>')).trim();
+				String p2 = s.substring(s.indexOf('>')+1, s.indexOf('[')).trim();
+				int cp = Integer.parseInt(p1);
+				int sp = Integer.parseInt(p2);
+				int len = Integer.parseInt(Parser.data.get(i).get(5).trim());
+					
+				if(Parser.data.get(i).get(6).contains("[SYN]"))
+					connections.add(new TCPConnection(t, server, client, sp, cp, len));
+
+				else if(Parser.data.get(i).get(6).contains("[FIN, ACK]") || Parser.data.get(i).get(6).contains("[RST]"))
+				{
+					for(int j=0;j<connections.size();++j)
+					{
+						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						{
+							time.add(t - connections.get(j).getTime());
+							packetsSize.add(connections.get(j).size+len);
+							connections.remove(j);
+							break;
+						}
+					}
+				}
+
+				else
+				{
+					for(int j=0;j<connections.size();++j)
+					{
+						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+							connections.get(j).size += len;
+					}
+				}
+			}
+		}
+
+		double avg_time = 0;
+		double avg_length = 0;
+
+		for(int i=0;i<time.size();++i)
+		{
+			avg_time += time.get(i);
+			avg_length += (double)packetsSize.get(i);
+
+			if(time.get(i)<1000 && packetsSize.get(i)<40000)
+				out.println(time.get(i)+" "+packetsSize.get(i));
+		}
+
+		avg_time = avg_time/time.size();
+		avg_length = avg_length/time.size();
+
+		double x = 0, y = 0, z = 0;
+
+		for(int i=0;i<time.size();++i)
+		{
+			x += (time.get(i)-avg_time)*(packetsSize.get(i)-avg_length);
+			y += (time.get(i)-avg_time)*(time.get(i)-avg_time);
+			z += (packetsSize.get(i)-avg_length)*(packetsSize.get(i)-avg_length);
+		}
+
+		double corr_coeff = x/((Math.sqrt(y))*(Math.sqrt(z)));
+
+		System.out.println(corr_coeff);
+
+
+		// Collections.sort(packetsSize);
+		// double size = packetsSize.size();
+
+		// for(int j=packetsSize.get(0), i=0;j<=67000;j+=1)
+		// {
+		// 	for(int k=i;;++k)
+		// 	{
+		// 		if(k==packetsSize.size() || packetsSize.get(k)>j)
+		// 		{
+		// 			i = k-1;
+		// 			break;
+		// 		}
+		// 	}
+
+		// 	out.println(j+" "+((i+1)/size));
+		// }
+
 		out.close();
 	}
 }
