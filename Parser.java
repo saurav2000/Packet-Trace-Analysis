@@ -23,8 +23,7 @@ class Parser
 			while(k<line.length())
 			{
 				int index = line.indexOf('"',k);
-				String temp = line.substring(k, index);
-				temp.trim();
+				String temp = line.substring(k, index).trim();
 				columns.add(temp);
 				k = index+3;
 			}
