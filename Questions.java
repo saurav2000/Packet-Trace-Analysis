@@ -32,8 +32,8 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q5"));
 			// q5();
 
-			out = new PrintWriter(new File(arg+"_q6"));
-			q6();
+			// out = new PrintWriter(new File(arg+"_q6"));
+			// q6();
 
 			out = new PrintWriter(new File(arg+"_q7"));
 			q7();
@@ -356,7 +356,7 @@ class Questions
 		double size = diff.size();
 		int i = 0;
 
-		for(int j=0;j<diff.size();++j)
+		for(int j=0;j<diff.size();j+=15)
 			out.println(diff.get(j));
 
 		// out.println();
