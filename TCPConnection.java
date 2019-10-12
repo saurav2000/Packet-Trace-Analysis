@@ -3,16 +3,17 @@ class TCPConnection
 	private double startTime;
 	private String serverIP, clientIP;
 	private int serverPort, clientPort;
-	public int size;
+	public int sendSize, recvSize;
 
-	TCPConnection(double t, String a, String b, int x, int y, int s)
+	TCPConnection(double t, String a, String b, int x, int y, int s1, int s2)
 	{
 		startTime = t;
 		serverIP = a;
 		clientIP = b;
 		serverPort = x;
 		clientPort = y;
-		size = s;
+		sendSize = s1;
+		recvSize = s2;
 	}
 
 	public boolean isIP(String x, String y)
@@ -28,5 +29,10 @@ class TCPConnection
 	public double getTime()
 	{
 		return startTime;
+	}
+
+	public boolean isServer(String x, int y)
+	{
+		return x.equals(serverIP) && y==serverPort;
 	}
 }
