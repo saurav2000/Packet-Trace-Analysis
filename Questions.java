@@ -23,26 +23,29 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q2"));
 			// q2();
 
-			// out = new PrintWriter(new File(arg+"_q3"));
-			// q3();
+			out = new PrintWriter(new File(arg+"_q3"));
+			q3();
 
-			// out = new PrintWriter(new File(arg+"_q4"));
-			// q4();
+			out = new PrintWriter(new File(arg+"_q4"));
+			q4();
 
-			// out = new PrintWriter(new File(arg+"_q5"));
-			// q5();
+			out = new PrintWriter(new File(arg+"_q5_send_vs_time"));
+			q5(true);
 
-			// out = new PrintWriter(new File(arg+"_q6"));
-			// q6();
+			out = new PrintWriter(new File(arg+"_q5_send_vs_recv"));
+			q5(false);
 
-			// out = new PrintWriter(new File(arg+"_q7"));
-			// q7();
+			out = new PrintWriter(new File(arg+"_q6"));
+			q6(false);
 
-			// out = new PrintWriter(new File(arg+"_q8_send"));
-			// q8(true);
+			out = new PrintWriter(new File(arg+"_q7"));
+			q7(false);
 
-			// out = new PrintWriter(new File(arg+"_q8_recv"));
-			// q8(false);
+			out = new PrintWriter(new File(arg+"_q8_send"));
+			q8(true);
+
+			out = new PrintWriter(new File(arg+"_q8_recv"));
+			q8(false);
 
 			out = new PrintWriter(new File(arg+"_q11_avg_queue_size"));
 			q11(true);
@@ -177,7 +180,7 @@ class Questions
 		out.close();
 	}
 
-	public static void q5()
+	public static void q5(boolean tim)
 	{
 		ArrayList<TCPConnection> connections = new ArrayList<>();
 		ArrayList<Integer> sendSizes = new ArrayList<>();
@@ -251,8 +254,16 @@ class Questions
 			avg_sendLength += (double)sendSizes.get(i);
 			avg_recvLength += (double)recvSizes.get(i);
 
-			if(time.get(i)<1000 && sendSizes.get(i)<40000)
-				out.println(time.get(i)+" "+sendSizes.get(i));
+			if(!tim)
+			{
+				if(recvSizes.get(i)<40000 && sendSizes.get(i)<40000)
+					out.println(recvSizes.get(i)+" "+sendSizes.get(i));
+			}
+			else
+			{
+				if(time.get(i)<1000 && sendSizes.get(i)<40000)
+					out.println(time.get(i)+" "+sendSizes.get(i));
+			}
 		}
 
 		avg_time = avg_time/time.size();
@@ -270,7 +281,11 @@ class Questions
 			v += (recvSizes.get(i)-avg_recvLength)*(sendSizes.get(i)-avg_sendLength);
 		}
 
-		double corr_coeff = v/((Math.sqrt(w))*(Math.sqrt(z)));
+		double corr_coeff = 0;
+		if(!tim)
+			corr_coeff = v/((Math.sqrt(w))*(Math.sqrt(z)));
+		else
+			corr_coeff = x/((Math.sqrt(y))*(Math.sqrt(z)));
 
 		System.out.println(corr_coeff);
 
@@ -295,7 +310,7 @@ class Questions
 		out.close();
 	}
 
-	public static void q6()
+	public static void q6(boolean r)
 	{
 		//Inter arrival time of connections
 		ArrayList<Double> diff = new ArrayList<>();
@@ -315,27 +330,29 @@ class Questions
 		double size = diff.size();
 		int i = 0;
 
-		for(int j=0;j<diff.size()-1;++j)
-			out.println(diff.get(j));
+		if(r)
+			for(int j=0;j<diff.size()-1;++j)
+				out.println(diff.get(j));
+		else
+		{
+			for(double j = diff.get(0); j<=diff.get((int)size-1);j+=0.5)
+			{
+				for(int k=i;;++k)
+				{
+					if(k==diff.size() || diff.get(k)>j)
+					{
+						i = k-1;
+						break;
+					}
+				}
 
-		// out.println();
-		// for(double j = diff.get(0); j<=diff.get((int)size-1);j+=0.5)
-		// {
-		// 	for(int k=i;;++k)
-		// 	{
-		// 		if(k==diff.size() || diff.get(k)>j)
-		// 		{
-		// 			i = k-1;
-		// 			break;
-		// 		}
-		// 	}
-
-		// 	out.println(j+" "+((i+1)/size));
-		// }
+				out.println(j+" "+((i+1)/size));
+			}
+		}
 		out.close();
 	}
 
-	public static void q7()
+	public static void q7(boolean r)
 	{
 		//Inter arrival time of packets sent to servers
 		HashSet<String> servers = new HashSet<>();
@@ -361,23 +378,26 @@ class Questions
 		double size = diff.size();
 		int i = 0;
 
-		for(int j=0;j<diff.size();j+=15)
-			out.println(diff.get(j));
+		if(r)
+			for(int j=0;j<diff.size();j+=15)
+				out.println(diff.get(j));
+		else
+		{
+			for(double j = diff.get(0); j<=diff.get((int)size-1);j+=0.1)
+			{
+				for(int k=i;;++k)
+				{
+					if(k==diff.size() || diff.get(k)>j)
+					{
+						i = k-1;
+						break;
+					}
+				}
 
-		// out.println();
-		// for(double j = diff.get(0); j<=diff.get((int)size-1);j+=0.1)
-		// {
-		// 	for(int k=i;;++k)
-		// 	{
-		// 		if(k==diff.size() || diff.get(k)>j)
-		// 		{
-		// 			i = k-1;
-		// 			break;
-		// 		}
-		// 	}
-
-		// 	out.println(j+" "+((i+1)/size));
-		// }
+				out.println(j+" "+((i+1)/size));
+			}	
+		}
+		
 		out.close();
 	}
 
