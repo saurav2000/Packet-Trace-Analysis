@@ -35,11 +35,11 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q5_send_vs_recv"));
 			// q5(false);
 
-			// out = new PrintWriter(new File(arg+"_q6"));
-			// q6(true);
+			out = new PrintWriter(new File(arg+"_q6"));
+			q6(true);
 
-			// out = new PrintWriter(new File(arg+"_q7"));
-			// q7(true);
+			out = new PrintWriter(new File(arg+"_q7"));
+			q7(true);
 
 			// out = new PrintWriter(new File(arg+"_q8_send"));
 			// q8(true);
@@ -333,8 +333,15 @@ class Questions
 
 		Collections.sort(diff);
 
-		double size = diff.size();
+		double size = diff.size(), avg = 0;
+		for(int i=0;i<diff.size();++i)
+			avg+= diff.get(i);
 		int i = 0;
+
+		
+		
+		System.out.println(avg/size);
+		System.out.println(diff.get(diff.size()/2)+"\n");
 
 		if(r)
 			for(int j=0;j<diff.size()-1;++j)
@@ -381,8 +388,15 @@ class Questions
 
 		Collections.sort(diff);
 
-		double size = diff.size();
+		double size = diff.size(), avg = 0;
+		for(int i=0;i<diff.size();++i)
+			avg+= diff.get(i);
 		int i = 0;
+
+		
+		
+		System.out.println(avg/size);
+		System.out.println(diff.get(diff.size()/2)+"\n");
 
 		if(r)
 			for(int j=0;j<diff.size();j+=15)
