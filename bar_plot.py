@@ -14,7 +14,7 @@ def plot(s):
 	plt.bar(xlist, ylist, width=0.9, align='edge')
 	plt.title(s)
 	plt.ylabel('No.of Connections')
-	plt.xlabel('Hour of day')
+	plt.xlabel('Hour of the day')
 	plt.savefig(s+"_figure.png")
 	plt.clf()
 
