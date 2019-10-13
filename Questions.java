@@ -23,32 +23,38 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q2"));
 			// q2();
 
-			out = new PrintWriter(new File(arg+"_q3"));
-			q3();
+			// out = new PrintWriter(new File(arg+"_q3"));
+			// q3();
 
-			out = new PrintWriter(new File(arg+"_q4"));
-			q4();
+			// out = new PrintWriter(new File(arg+"_q4"));
+			// q4();
 
-			out = new PrintWriter(new File(arg+"_q5_send_vs_time"));
-			q5(true);
+			// out = new PrintWriter(new File(arg+"_q5_send_vs_time"));
+			// q5(true);
 
-			out = new PrintWriter(new File(arg+"_q5_send_vs_recv"));
-			q5(false);
+			// out = new PrintWriter(new File(arg+"_q5_send_vs_recv"));
+			// q5(false);
 
-			out = new PrintWriter(new File(arg+"_q6"));
-			q6(false);
+			// out = new PrintWriter(new File(arg+"_q6"));
+			// q6(true);
 
-			out = new PrintWriter(new File(arg+"_q7"));
-			q7(false);
+			// out = new PrintWriter(new File(arg+"_q7"));
+			// q7(true);
 
-			out = new PrintWriter(new File(arg+"_q8_send"));
-			q8(true);
+			// out = new PrintWriter(new File(arg+"_q8_send"));
+			// q8(true);
 
-			out = new PrintWriter(new File(arg+"_q8_recv"));
-			q8(false);
+			// out = new PrintWriter(new File(arg+"_q8_recv"));
+			// q8(false);
 
-			out = new PrintWriter(new File(arg+"_q11_avg_queue_size"));
-			q11(true);
+			// out = new PrintWriter(new File(arg+"_q9_seq"));
+			// q9(true);
+
+			// out = new PrintWriter(new File(arg+"_q9_ack"));
+			// q9(false);
+
+			// out = new PrintWriter(new File(arg+"_q11_avg_queue_size"));
+			// q11(true);
 
 			out = new PrintWriter(new File(arg+"_q11_avg_waiting_time"));
 			q11(false);
@@ -147,7 +153,7 @@ class Questions
 				{
 					for(int j=0;j<connections.size();++j)
 					{
-						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						if(connections.get(j).isConn(client, cp, server, sp))
 						{
 							time.add(t - connections.get(j).getTime());
 							connections.remove(j);
@@ -208,7 +214,7 @@ class Questions
 				{
 					for(int j=0;j<connections.size();++j)
 					{
-						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						if(connections.get(j).isConn(client, cp, server, sp))
 						{
 							time.add(t - connections.get(j).getTime());
 							if(connections.get(j).isServer(server, sp))
@@ -231,7 +237,7 @@ class Questions
 				{
 					for(int j=0;j<connections.size();++j)
 					{
-						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						if(connections.get(j).isConn(client, cp, server, sp))
 						{
 							if(connections.get(j).isServer(server, sp))
 								connections.get(j).sendSize += len;
@@ -430,7 +436,7 @@ class Questions
 				{
 					for(int j=0;j<connections.size();++j)
 					{
-						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						if(connections.get(j).isConn(client, cp, server, sp))
 						{
 							if(connections.get(j).isServer(server, sp))
 								sendSizes.add(len);
@@ -446,7 +452,7 @@ class Questions
 				{
 					for(int j=0;j<connections.size();++j)
 					{
-						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
+						if(connections.get(j).isConn(client, cp, server, sp))
 						{
 							if(connections.get(j).isServer(server, sp))
 								sendSizes.add(len);
@@ -527,9 +533,91 @@ class Questions
 		return 0;
 	}
 
+	public static void q9(boolean seqBool)
+	{
+		ArrayList<TCPConnection> connections = new ArrayList<>();
+		ArrayList<Long> seq = null, ack = null;
+		ArrayList<Double> seqTime = null, ackTime = null;
+		long max = 0;
+		for(int i=0;i<Parser.data.size();++i)
+		{
+			if(Parser.data.get(i).get(4).equals("TCP"))
+			{
+				double t = Double.parseDouble(Parser.data.get(i).get(1));
+				String client = Parser.data.get(i).get(2);
+				String server = Parser.data.get(i).get(3);
+				String s = Parser.data.get(i).get(6);
+				String p1 = s.substring(0,s.indexOf('>')).trim();
+				String p2 = s.substring(s.indexOf('>')+1, s.indexOf('[')).trim();
+				int cp = Integer.parseInt(p1);
+				int sp = Integer.parseInt(p2);
+				int len = Integer.parseInt(Parser.data.get(i).get(5).trim());
+					
+				if(Parser.data.get(i).get(6).contains("[SYN]"))
+					connections.add(new TCPConnection(t, server, client, sp, cp, len, 0));
+				
+				else if(Parser.data.get(i).get(6).contains("[FIN, ACK]") || Parser.data.get(i).get(6).contains("[RST]"))
+				{
+					for(int j=0;j<connections.size();++j)
+					{
+						if(connections.get(j).isConn(client, cp, server, sp))
+						{
+							if(connections.get(j).getSize()>max)
+							{
+								seq = connections.get(j).getSeq();
+								ack = connections.get(j).getAck();
+								seqTime = connections.get(j).getSeqTime();
+								ackTime = connections.get(j).getAckTime();
+								max = connections.get(j).getSize();
+							}
+							connections.remove(j);
+							break;
+						}
+					}
+				}
+
+				else
+				{
+					for(int j=0;j<connections.size();++j)
+					{
+						if(connections.get(j).isConn(client, cp, server, sp))
+						{
+							if(connections.get(j).isServer(server, sp))
+							{
+								connections.get(j).sendSize += len;
+								long num = Parser.getNumber(s, false);
+								if(num!=-1)
+									connections.get(j).addAck(num, t);
+							}
+							else
+							{
+								connections.get(j).recvSize += len;
+								long num = Parser.getNumber(s, true);
+								if(num!=-1)
+									connections.get(j).addSeq(num, t);
+							}
+						}
+					}	
+				}
+			}
+		}
+			
+		int size = seqBool ? seq.size() : ack.size();
+		System.out.println(size);
+		for(int i=0;i<size;++i)
+		{
+			if(seqBool)
+				out.println(seqTime.get(i)+" "+seq.get(i));
+			else
+				out.println(ackTime.get(i)+" "+ack.get(i));
+		}
+
+		out.close();
+	}
+
 	public static void q11(boolean q)
 	{
-		double m = 128000/56.345;
+		double m = 128000/(56.345 * 8);
 
 		if(q)
 			for(double rho = 0;rho<1;rho+=0.001)
