@@ -30,4 +30,17 @@ class Parser
 			data.add(columns);
 		}		
 	}
+
+	public static long getNumber(String s, boolean seq)
+	{
+		if((seq&&s.indexOf("Seq")==-1)||(!seq&&s.indexOf("Ack")==-1)) return -1;
+
+		if(seq)
+			s = s.substring(s.indexOf("Seq")+4);
+		else
+			s = s.substring(s.indexOf("Ack")+4);
+
+		Scanner sc = new Scanner(s);
+		return sc.nextLong();
+	}
 }
