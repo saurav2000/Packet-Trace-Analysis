@@ -35,14 +35,20 @@ class Questions
 			// out = new PrintWriter(new File(arg+"_q6"));
 			// q6();
 
-			out = new PrintWriter(new File(arg+"_q7"));
-			q7();
+			// out = new PrintWriter(new File(arg+"_q7"));
+			// q7();
 
 			// out = new PrintWriter(new File(arg+"_q8_send"));
 			// q8(true);
 
 			// out = new PrintWriter(new File(arg+"_q8_recv"));
 			// q8(false);
+
+			out = new PrintWriter(new File(arg+"_q11_avg_queue_size"));
+			q11(true);
+
+			out = new PrintWriter(new File(arg+"_q11_avg_waiting_time"));
+			q11(false);
 		}catch(Exception e){e.printStackTrace();}
 	}
 
@@ -109,8 +115,7 @@ class Questions
 		}
 
 		for(int i=0;i<24;++i)
-			out.println("hr "+i+" to "+(i+1)+" = "+count[i]);
-		out.println();
+			out.println(i+" "+count[i]);
 		out.close();
 	}
 
@@ -376,7 +381,7 @@ class Questions
 		out.close();
 	}
 
-	public static void q8(boolean send)
+	public static double q8(boolean send)
 	{
 		ArrayList<TCPConnection> connections = new ArrayList<>();
 		ArrayList<Integer> sendSizes = new ArrayList<>();
@@ -396,7 +401,10 @@ class Questions
 				int len = Integer.parseInt(Parser.data.get(i).get(5).trim());
 					
 				if(Parser.data.get(i).get(6).contains("[SYN]"))
+				{
 					connections.add(new TCPConnection(0, server, client, sp, cp, len, 0));
+					sendSizes.add(len);
+				}
 
 				else if(Parser.data.get(i).get(6).contains("[FIN, ACK]") || Parser.data.get(i).get(6).contains("[RST]"))
 				{
@@ -405,15 +413,9 @@ class Questions
 						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
 						{
 							if(connections.get(j).isServer(server, sp))
-							{
-								sendSizes.add(connections.get(j).sendSize+len);
-								recvSizes.add(connections.get(j).recvSize);
-							}
+								sendSizes.add(len);
 							else
-							{
-								sendSizes.add(connections.get(j).sendSize);
-								recvSizes.add(connections.get(j).recvSize+len);
-							}
+								recvSizes.add(len);
 							connections.remove(j);
 							break;
 						}
@@ -427,9 +429,9 @@ class Questions
 						if(connections.get(j).isIP(client, server) && connections.get(j).isPort(cp, sp))
 						{
 							if(connections.get(j).isServer(server, sp))
-								connections.get(j).sendSize += len;
+								sendSizes.add(len);
 							else
-								connections.get(j).recvSize += len;
+								recvSizes.add(len);
 							break;
 						}
 					}
@@ -443,11 +445,30 @@ class Questions
 		double sendSize = sendSizes.size();
 		double recvSize = recvSizes.size();
 
+		double avg_length = 0;
+
+		for(int i=0;i<sendSizes.size();++i)
+		{
+			avg_length += sendSizes.get(i);
+		}
+
+		for(int i=0;i<recvSizes.size();++i)
+		{
+			avg_length += recvSizes.get(i);
+		}
+
+		avg_length = avg_length/(sendSize+recvSize);
+
+		// System.out.println("Avg length of packet: " + avg_length);
+
+
 		if(send)
 		{
 			int i = 0;
-			for(int j = sendSizes.get(0); j<=sendSizes.get((int)sendSize-1);j+=1)
+			for(int j = 1; j<=sendSizes.get((int)sendSize-1);j+=1)
 			{
+				if(i<0)
+					i=0;
 				for(int k=i;;++k)
 				{
 					if(k==sendSizes.size() || sendSizes.get(k)>j)
@@ -460,13 +481,16 @@ class Questions
 				out.println(j+" "+((i+1)/sendSize));
 			}
 			out.close();
+			return avg_length;
 		}
 
 		else
 		{
 			int i = 0;
-			for(int j = recvSizes.get(0); j<=recvSizes.get((int)recvSize-1);j+=1)
+			for(int j = 1; j<=recvSizes.get((int)recvSize-1);j+=1)
 			{
+				if(i<0)
+					i=0;
 				for(int k=i;;++k)
 				{
 					if(k==recvSizes.size() || recvSizes.get(k)>j)
@@ -480,5 +504,20 @@ class Questions
 			}
 			out.close();
 		}
+		return 0;
+	}
+
+	public static void q11(boolean q)
+	{
+		double m = 128000/56.345;
+
+		if(q)
+			for(double rho = 0;rho<1;rho+=0.001)
+				out.println(rho+" "+(rho/(1-rho)));
+		else
+			for(double rho = 0;rho<1;rho+=0.001)
+				out.println(rho+" "+(rho/(m*(1-rho))));
+
+		out.close();
 	}
 }
