@@ -78,6 +78,7 @@ descdist(df_file1_q7$X)
 
 par(mfrow=c(2,2))
 file1_q7_fe_exp <- fitdist(df_file1_q7$X, "exp")
+file1_q7_fe_exp
 denscomp(list(file1_q7_fe_exp), legendtext=c("exp"))
 cdfcomp(list(file1_q7_fe_exp), legendtext=c("exp"))
 qqcomp(list(file1_q7_fe_exp), legendtext=c("exp"))
@@ -102,6 +103,7 @@ descdist(df_file2_q7$X)
 
 par(mfrow=c(2,2))
 file2_q7_fe_exp <- fitdist(df_file2_q7$X, "exp")
+file2_q7_fe_exp
 denscomp(list(file2_q7_fe_exp), legendtext=c("exp"))
 cdfcomp(list(file2_q7_fe_exp), legendtext=c("exp"))
 qqcomp(list(file2_q7_fe_exp), legendtext=c("exp"))
@@ -126,6 +128,7 @@ descdist(df_file3_q7$X)
 
 par(mfrow=c(2,2))
 file3_q7_fe_exp <- fitdist(df_file3_q7$X, "exp")
+file3_q7_fe_exp
 denscomp(list(file3_q7_fe_exp), legendtext=c("exp"))
 cdfcomp(list(file3_q7_fe_exp), legendtext=c("exp"))
 qqcomp(list(file3_q7_fe_exp), legendtext=c("exp"))
